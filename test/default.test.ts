@@ -258,8 +258,15 @@ test('DualAlbFargateService - vpc subnet select default select private subnet', 
           },
         ],
         Subnets: [
-          'p-12345',
-          'p-67890',
+          {
+            Ref: 'ServiceVpcPrivateSubnet1Subnet5DB98340',
+          },
+          {
+            Ref: 'ServiceVpcPrivateSubnet2Subnet0A0B778B',
+          },
+          {
+            Ref: 'ServiceVpcPrivateSubnet3SubnetFED5903C',
+          },
         ],
       },
     },
@@ -304,8 +311,15 @@ test('DualAlbFargateService - vpc subnet select test select public subnet', () =
           },
         ],
         Subnets: [
-          's-12345',
-          's-67890',
+          {
+            Ref: 'ServiceVpcPublicSubnet1Subnet7B418339',
+          },
+          {
+            Ref: 'ServiceVpcPublicSubnet2SubnetDE1A00CE',
+          },
+          {
+            Ref: 'ServiceVpcPublicSubnet3SubnetDDA2D85D',
+          },
         ],
       },
     },
