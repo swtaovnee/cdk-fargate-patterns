@@ -19,9 +19,10 @@ new DualAlbFargateService(stack, 'Service', {
   spot: true, // FARGATE_SPOT only cluster
   tasks: [
     {
-      listenerPort: 80,
       task: orderTask,
       desiredCount: 2,
+      internal: { port: 443, cert },
+      external: { port: 80 },
       // customize the service autoscaling policy
       scalingPolicy: {
         maxCapacity: 20,
@@ -29,8 +30,8 @@ new DualAlbFargateService(stack, 'Service', {
         targetCpuUtilization: 50,
       },
     },
-    { listenerPort: 8080, task: customerTask, desiredCount: 2 },
-    { listenerPort: 9090, task: productTask, desiredCount: 2 },
+    { task: customerTask, desiredCount: 2, internal: { port: 8080 } },
+    { task: productTask, desiredCount: 2, internal: { port: 9090 } },
   ],
   route53Ops: {
     zoneName, // svc.local
@@ -50,8 +51,8 @@ To specify mixed strategy with partial `FARGATE` and partial `FARGATE_SPOT`, spe
 new DualAlbFargateService(stack, 'Service', {
   tasks: [
     {
-      listenerPort: 8080,
       task: customerTask,
+      internal: { port: 8080 },
       desiredCount: 2,
       capacityProviderStrategy: [
         {
@@ -75,20 +76,25 @@ The custom capacity provider strategy will be applied if `capacityProviderStrete
 
 Simply turn on the `enableExecuteCommand` property to enable the [ECS Exec](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-exec.html) support for all services.
 
-## Internal or External Only
+## Internal, External or Both
 
-By default, all task(s) defined in the `DualAlbFargateService` will be registered to both external and internal ALBs. 
-Set `accessibility` to make it internal only, external only, or both.
+Specify the `internal` or `external` property to expose your service internally, externally or both.
+
+The `cert` property implies `HTTPS` protocol.
 
 ```ts
 new DualAlbFargateService(stack, 'Service', {
     tasks: [
       // this task is internal only
-      { listenerPort: 8080, task: task1, accessibility: LoadBalancerAccessibility.INTERNAL_ONLY},
+      { task: task1, internal: { port: 8080 } },
       // this task is external only
-      { listenerPort: 8081, task: task2, accessibility: LoadBalancerAccessibility.EXTERNAL_ONLY},
-      // this task is both external and internal facing(default behavior)
-      { listenerPort: 8082, task: task3 },
+      { task: task2, external: { port: 8081 } },
+      // this task is both external(HTTPS) and internal(HTTP) facing
+      { 
+        task: task3,
+        external: { port: 443, cert: myAcmCert },
+        internal: { port: 8888 },
+      },
     ],
   });
 ```
