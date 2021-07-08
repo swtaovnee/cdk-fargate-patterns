@@ -101,31 +101,31 @@ phpTask.addContainer('php', {
   ],
 });
 
-// laravel-nginx-php-fpm service
-const laravelNginxPhpFpmTask = new ecs.FargateTaskDefinition(stack, 'laravelNginxPhpFpmTask', {
-  cpu: 256,
-  memoryLimitMiB: 512,
-});
+// // laravel-nginx-php-fpm service
+// const laravelNginxPhpFpmTask = new ecs.FargateTaskDefinition(stack, 'laravelNginxPhpFpmTask', {
+//   cpu: 256,
+//   memoryLimitMiB: 512,
+// });
 
-laravelNginxPhpFpmTask.addContainer('laravel-nginx-php-fpm', {
-  image: ecs.ContainerImage.fromAsset(path.join(__dirname, '../services/laravel-nginx-php-fpm')),
-  portMappings: [
-    { containerPort: 80 },
-  ],
-});
+// laravelNginxPhpFpmTask.addContainer('laravel-nginx-php-fpm', {
+//   image: ecs.ContainerImage.fromAsset(path.join(__dirname, '../services/laravel-nginx-php-fpm')),
+//   portMappings: [
+//     { containerPort: 80 },
+//   ],
+// });
 
-// laravel-bitnami service
-const laravelBitnamiTask = new ecs.FargateTaskDefinition(stack, 'laravelBitnamiTask', {
-  cpu: 256,
-  memoryLimitMiB: 512,
-});
+// // laravel-bitnami service
+// const laravelBitnamiTask = new ecs.FargateTaskDefinition(stack, 'laravelBitnamiTask', {
+//   cpu: 256,
+//   memoryLimitMiB: 512,
+// });
 
-laravelBitnamiTask.addContainer('laravel-bitnami', {
-  image: ecs.ContainerImage.fromAsset(path.join(__dirname, '../services/laravel-bitnami')),
-  portMappings: [
-    { containerPort: 3000 },
-  ],
-});
+// laravelBitnamiTask.addContainer('laravel-bitnami', {
+//   image: ecs.ContainerImage.fromAsset(path.join(__dirname, '../services/laravel-bitnami')),
+//   portMappings: [
+//     { containerPort: 3000 },
+//   ],
+// });
 
 // NuxtJS service
 const nuxtTask = new ecs.FargateTaskDefinition(stack, 'nuxtTask', {
@@ -216,20 +216,20 @@ const svc = new DualAlbFargateService(stack, 'Service', {
       internal: { port: 9094 },
       external: { port: 9094 },
     },
-    // The laravel-nginx-php-fpm service(external/internal)
-    {
-      task: laravelNginxPhpFpmTask,
-      desiredCount: 1,
-      internal: { port: 9095 },
-      external: { port: 9095 },
-    },
-    // The laravel-bitnami service(external/internal)
-    {
-      task: laravelBitnamiTask,
-      desiredCount: 1,
-      internal: { port: 9096 },
-      external: { port: 9096 },
-    },
+    // // The laravel-nginx-php-fpm service(external/internal)
+    // {
+    //   task: laravelNginxPhpFpmTask,
+    //   desiredCount: 1,
+    //   internal: { port: 9095 },
+    //   external: { port: 9095 },
+    // },
+    // // The laravel-bitnami service(external/internal)
+    // {
+    //   task: laravelBitnamiTask,
+    //   desiredCount: 1,
+    //   internal: { port: 9096 },
+    //   external: { port: 9096 },
+    // },
     // java spring boot service(external/internal)
     {
       task: javaTask,
