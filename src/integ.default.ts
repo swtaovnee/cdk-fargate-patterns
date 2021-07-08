@@ -206,13 +206,31 @@ const svc = new DualAlbFargateService(stack, 'Service', {
       ],
     },
     // The produce service(internal only)
-    { task: productTask, desiredCount: 1, internal: { port: 9090 } },
+    {
+      task: productTask,
+      desiredCount: 1,
+      internal: { port: 9090 },
+    },
     // The nginx service(external only)
-    { task: nginxTask, desiredCount: 1, external: { port: 9091 } },
+    {
+      task: nginxTask,
+      desiredCount: 1,
+      external: { port: 9091 },
+    },
     // The nginx-php-fpm service(external/internal)
-    // { listenerPort: 9092, task: phpTask, desiredCount: 1 },
+    {
+      task: phpTask,
+      desiredCount: 1,
+      internal: { port: 9092 },
+      external: { port: 9092 },
+    },
     // The NuxtJS service(external/internal)
-    // { listenerPort: 9093, task: nuxtTask, desiredCount: 1 },
+    {
+      task: nuxtTask,
+      desiredCount: 1,
+      internal: { port: 9093 },
+      external: { port: 9093 },
+    },
     // The node service(external/internal)
     {
       task: nodeTask,
