@@ -157,11 +157,19 @@ $ npx cdk --app lib/integ.default.js -c use_default_vpc=1 diff
 $ npx cdk --app lib/integ.default.js -c use_default_vpc=1 deploy
 ```
 
+To deploy with HTTPS-only with existing ACM certificate in your default VPC:
+
+```sh
+$ npx cdk --app lib/integ.default.js deploy -c use_default_vpc=1 -c ACM_CERT_ARN=<YOUR_ACM_CERT_ARN>
+```
+
 On deployment complete, you will see the external ALB endpoint in the CDK output. `cURL` the external HTTP endpoint and you should be able to see the aggregated response.
 
 
 ```sh
 $ curl http://demo-Servi-EH1OINYDWDU9-1397122594.ap-northeast-1.elb.amazonaws.com
+or
+$ curl https://<YOUR_CUSTOM_DOMAIN_NAME>
 
 {"service":"order", "version":"1.0"}
 {"service":"product","version":"1.0"}

@@ -1,4 +1,5 @@
 import * as path from 'path';
+import * as acm from '@aws-cdk/aws-certificatemanager';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import * as ecs from '@aws-cdk/aws-ecs';
 import * as cdk from '@aws-cdk/core';
@@ -101,18 +102,18 @@ phpTask.addContainer('php', {
   ],
 });
 
-// // laravel-nginx-php-fpm service
-// const laravelNginxPhpFpmTask = new ecs.FargateTaskDefinition(stack, 'laravelNginxPhpFpmTask', {
-//   cpu: 256,
-//   memoryLimitMiB: 512,
-// });
+// laravel-nginx-php-fpm service
+const laravelNginxPhpFpmTask = new ecs.FargateTaskDefinition(stack, 'laravelNginxPhpFpmTask', {
+  cpu: 256,
+  memoryLimitMiB: 512,
+});
 
-// laravelNginxPhpFpmTask.addContainer('laravel-nginx-php-fpm', {
-//   image: ecs.ContainerImage.fromAsset(path.join(__dirname, '../services/laravel-nginx-php-fpm')),
-//   portMappings: [
-//     { containerPort: 80 },
-//   ],
-// });
+laravelNginxPhpFpmTask.addContainer('laravel-nginx-php-fpm', {
+  image: ecs.ContainerImage.fromAsset(path.join(__dirname, '../services/laravel-nginx-php-fpm')),
+  portMappings: [
+    { containerPort: 80 },
+  ],
+});
 
 // // laravel-bitnami service
 // const laravelBitnamiTask = new ecs.FargateTaskDefinition(stack, 'laravelBitnamiTask', {
@@ -166,6 +167,9 @@ javaTask.addContainer('java', {
   ],
 });
 
+const certArn = stack.node.tryGetContext('ACM_CERT_ARN');
+const cert = certArn ? acm.Certificate.fromCertificateArn(stack, 'Cert', certArn) : undefined;
+
 const svc = new DualAlbFargateService(stack, 'Service', {
   spot: true, // FARGATE_SPOT only cluster
   enableExecuteCommand: true,
@@ -175,7 +179,7 @@ const svc = new DualAlbFargateService(stack, 'Service', {
       task: orderTask,
       desiredCount: 2,
       internal: { port: 80 },
-      external: { port: 80 },
+      external: cert ? { port: 443, certificate: [cert] } : { port: 80 },
       // customize the service autoscaling policy
       scalingPolicy: {
         maxCapacity: 20,
@@ -216,13 +220,13 @@ const svc = new DualAlbFargateService(stack, 'Service', {
       internal: { port: 9094 },
       external: { port: 9094 },
     },
-    // // The laravel-nginx-php-fpm service(external/internal)
-    // {
-    //   task: laravelNginxPhpFpmTask,
-    //   desiredCount: 1,
-    //   internal: { port: 9095 },
-    //   external: { port: 9095 },
-    // },
+    // The laravel-nginx-php-fpm service(external/internal)
+    {
+      task: laravelNginxPhpFpmTask,
+      desiredCount: 1,
+      internal: { port: 9095 },
+      external: { port: 9095 },
+    },
     // // The laravel-bitnami service(external/internal)
     // {
     //   task: laravelBitnamiTask,
